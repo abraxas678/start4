@@ -26,9 +26,10 @@ mkdir $HOME/tmp/$ts/nq; cd $HOME/tmp/$ts/nq; wget https://github.com/leahneukirc
 [[ ! -d $HOME/github/nq ]] && mkdir $HOME/github/nq
 mv $HOME/tmp/$ts/nq/* $HOME/github/nq/
 cp ./github/nq /usr/bin && cp ./github/fq /usr/bin && cp ./github/tq /usr/bin
-chmod +x /usr/bin/*
+sudo chmod +x /usr/bin/*
 ##########################################################################################    /NQ
 
+mkdir $HOME/tmp/$ts/python
 $NQDIR="$HOME/tmp/$ts/python"
 [[ $(which "python3") = *"not found"* ]] && nq sudo apt-get install python3-pip -y
 [[ $(which "rich") = *"not found"* ]] && nq python -m pip install rich-cli
