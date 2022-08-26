@@ -19,8 +19,8 @@ echo "CURRENT USER: $USER"; read -t 1 me
 ##########################################################################################    /USER SETUP
 
 ##########################################################################################    NQ/
-APP_INSTALL="unzip"; [[ $($APP_INSTALL --version) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
-APP_INSTALL="wget"; [[ $($APP_INSTALL --version) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+APP_INSTALL="unzip"; [[ $(which $APP_INSTALL >/dev/null 2>/dev/null) = *"not found"* ]] || sudo apt-get install $APP_INSTALL -y
+APP_INSTALL="wget"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
 mkdir $HOME/tmp/$ts/nq; cd $HOME/tmp/$ts/nq; wget https://github.com/leahneukirchen/nq/archive/refs/heads/master.zip; unzip master.zip; rm -f master.zip
 [[ ! -d $HOME/github ]] && mkdir $HOME/github
 [[ ! -d $HOME/github/nq ]] && mkdir $HOME/github/nq
@@ -35,7 +35,7 @@ NQDIR="$HOME/tmp/$ts/python"
 [[ $(which "rich") = *"not found"* ]] && nq python -m pip install rich-cli
 
 ##########################################################################################    TAILSCALE/
-APP_INSTALL="lsof"; [[ $($APP_INSTALL --version) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+APP_INSTALL="lsof"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
 curl -fsSL https://tailscale.com/install.sh | sh | tail -f -n5
 sudo tailscale up --ssh
 sudo systemctl enable tailscaled
@@ -66,8 +66,8 @@ echo "sudo tailscale file cp $HOME/.bashrc $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4
 nq -w
 frage
 
-APP_INSTALL="nano"; [[ $($APP_INSTALL --version) = *"not found"* ]] && nq sudo apt-get install $APP_INSTALL -y
-APP_INSTALL="git"; [[ $($APP_INSTALL --version) = *"not found"* ]] && nq sudo apt-get install $APP_INSTALL -y && git config --global user.name abraxas678 && git config --global user.email abraxas678@gmail.com
+APP_INSTALL="nano"; [[ $(which $APP_INSTALL) = *"not found"* ]] && nq sudo apt-get install $APP_INSTALL -y
+APP_INSTALL="git"; [[ $(which $APP_INSTALL) = *"not found"* ]] && nq sudo apt-get install $APP_INSTALL -y && git config --global user.name abraxas678 && git config --global user.email abraxas678@gmail.com
 ng -w
 
 [[ ! -d $HOME/start4-backup ]] && mkdir $HOME/start4-backup
