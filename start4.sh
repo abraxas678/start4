@@ -1,6 +1,6 @@
 clear
 #######################################################
-echo "version 4.04"
+echo "version 4.05"
 #######################################################
 export PATH=$PATH:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin:/usr/local/sbin:/usr/local/bin:/usr/path:/volume2/docker/utils/path:$HOME/.local/bin:$HOME/bin:/home/markus/.cargo/bin:/home/abraxas/.cargo/bin:/home/abraxas/.local/bin/:/home/abraxas/.cargo/bin:/home/linuxbrew/.linuxbrew/bin:/volume1/homes/abraxas678/bin:/usr/local/bin:$PATH
 ts=$(date +"%s")
@@ -31,8 +31,8 @@ sudo chmod +x /usr/bin/*
 
 mkdir $HOME/tmp/$ts/python
 NQDIR="$HOME/tmp/$ts/python"
-[[ $(which "python3") = *"not found"* ]] && nq sudo apt-get install python3-pip -y
-[[ $(which "rich") = *"not found"* ]] && nq python -m pip install rich-cli
+[[ $(which "python3") = *"not found"* ]] || nq sudo apt-get install python3-pip -y
+[[ $(which "rich") = *"not found"* ]] || nq python -m pip install rich-cli
 
 ##########################################################################################    TAILSCALE/
 APP_INSTALL="lsof"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
