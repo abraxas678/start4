@@ -59,25 +59,16 @@ echo "sudo tailscale file cp $HOME/myfilter.txt  $MY_TAILSCALE_IP:" >>$HOME/tmp/
 echo "sudo tailscale file cp $HOME/.bashrc $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
 ##########################################################################################    /TAILSCALE
 
+[[ $(which "python3") = *"not found"* ]] && sudo apt-get install python3-pip -y
+[[ $(which "rich") = *"not found"* ]] && python -m pip install rich-cli
 
-sudo apt-get install python3-pip nano -y
-python -m pip install rich-cli
-
-cd $HOME
-$APP_INSTALL="wget"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+$APP_INSTALL="nano"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
 $APP_INSTALL="git"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y && git config --global user.name abraxas678 && git config --global user.email abraxas678@gmail.com
-[[ -d start4 ]] &&  mv start4 start4-backup-$ts
+[[ ! -d $HOME/start4-backup ]] && mkdir $HOME/start4-backup
+[[ -d $HOME/start4 ]] &&  mv  $HOME/start4 $HOME/start4-backup/start4-backup-$ts
 cd $HOME/tmp/$ts
-
 git clone https://raw.githubusercontent.com/abraxas678/start4/main/start4.sh $HOME/tmp/$ts/start4
-mv $HOME/tmp/$ts/start4 $HOME/start4
-source $HOME/start4/path.dat
-
-
-
-
-
-
+mv $HOME/tmp/$ts/start4 $HOME/start4; source $HOME/start4/path.dat
 
 echo "#####################################################################"
 echo "                      CHECKING HARDWARE"
