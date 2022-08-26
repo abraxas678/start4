@@ -5,28 +5,97 @@ export PATH=$PATH:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/u
 ts=$(date +"%s")
 MY_FLOW_ID=$ts
 
-mkdir $HOME/tmp >/dev/null 2>/dev/null
-echo "CURRENT USER: $USER" 
-read -t 1 me
 
+[[ ! -d  $HOME/tmp ]] && mkdir $HOME/tmp
+[[ ! -d  $HOME/github ]] && mkdir $HOME/github
+mkdir $HOME/tmp/$ts
+
+
+##########################################################################################    USER SETUP/
+echo "CURRENT USER: $USER"; read -t 1 me
 [[ $USER != "abraxas" ]] && [[ ! $(id -u abraxas) ]] && sudo adduser abraxas && sudo passwd abraxas && sudo usermod -aG sudo abraxas && su abraxas
 [[ $USER != "abraxas" ]] && su abraxas
 echo "CURRENT USER: $USER"
 [[ $USER != "abraxas" ]]  && read -p BUTTON me || read -t 2 me
+##########################################################################################    /USER SETUP
 
-if [[ -d start2 ]]
-then
-  mv start2 start2-backup-$ts
-fi
+##########################################################################################    TAILSCALE/
+$APP_INSTALL="lsof"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+curl -fsSL https://tailscale.com/install.sh | sh | tail -f -n5
+sudo tailscale up --ssh
+sudo systemctl enable tailscaled
+sudo systemctl start tailscaled
+
+##########################################################################################    /TAILSCALE
 
 cd $HOME
-sudo apt-get install wget git -y
-git config --global user.name abraxas678
-git config --global user.email abraxas678@gmail.com
-git clone https://raw.githubusercontent.com/abraxas678/start2/main/start.sh
-source $HOME/start2/path.dat
-git clone https://github.com/leahneukirchen/nq
-cp ./nq/nq /usr/bin && cp ./nq/fq /usr/bin && cp ./nq/tq /usr/bin
+$APP_INSTALL="wget"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+$APP_INSTALL="git"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y && git config --global user.name abraxas678 && git config --global user.email abraxas678@gmail.com
+[[ -d start4 ]] &&  mv start4 start4-backup-$ts
+cd $HOME/tmp/$ts
+
+git clone https://raw.githubusercontent.com/abraxas678/start4/main/start4.sh $HOME/tmp/$ts/start4
+mv $HOME/tmp/$ts/start4 $HOME/start4
+source $HOME/start4/path.dat
+
+git clone https://github.com/leahneukirchen/nq $HOME/tmp/$ts/nq
+mv $HOME/tmp/$ts/nq $HOME/github/nq
+cp ./github/nq /usr/bin && cp ./github/fq /usr/bin && cp ./github/tq /usr/bin
+chmod + /usr/bin
+
+
 sudo apt-get install python3-pip nano -y
 python -m pip install rich-cli
+
+
+echo "#####################################################################"
+echo "                      CHECKING HARDWARE"
+echo "#####################################################################"
+echo; sleep 2
+###   df /home grösser 50GB?
+chmod +x $HOME/start2/*.sh
+[[ $(df -h /home  |awk '{ print $2 }' |tail -n1 | sed 's/G//' | sed 's/\./,/') -lt 50 ]] && /bin/bash $HOME/start2/new-disk.sh
+
+
+echo "#####################################################################"
+echo "              COLLECTING INSTALLATION PREFERENCES"
+echo "#####################################################################"
+echo; sleep 2
+x=0; tput sc; while [[ $x -eq 0 ]]; do
+  echo; printf "DEFINE SPEED (default=2): "; read myspeed; echo
+  echo "speed [$myspeed]"
+  [[ ${#myspeed} -gt 0 ]] && x=1 || tput rc
+done
+[[ $(echo $RESTIC_PASSWORD | md5sum) != *"81a8c96e402c1647469856787d5c8503"* ]] && echo && printf "restic password: >>> " && read -n 4 myresticpw && export RESTIC_PASSWORD=$myresticpw
+x=0; tput sc; while [[ $x -eq 0 ]]; do
+  [[ ${#myresticpw} -gt 0 ]] && x=1 || echo; tput rc; read -p "restic pw: " myresticpw
+done
+export RESTIC_REPOSITORY=rclone:gd:restic
+x=0; tput sc; while [[ $x -eq 0 ]]; do
+  read -p "RC PW: " rcpw 
+  [[ ${#rcpw} -gt 0 ]] && x=1 || tput rc
+done
+echo $rcpw > ~/rcpw
+
+
+
+countdown 20
+[[ $(/home/linuxbrew/.linuxbrew/bin/pueue -V) = *"Pueue client"* ]] && MY_PUEUE_INST=1 || MY_PUEUE_INST=0
+echo; echo MY_PUEUE_INST $MY_PUEUE_INST
+countdown 3
+[[ $MY_PUEUE_INST -eq 1 ]] && pueue-init
+[[ $MY_PUEUE_INST -eq 1 ]] && /home/linuxbrew/.linuxbrew/bin/pueue add -g system-setup -- rclone copy df:bin/ $HOME/bin -P --update --password-command="cat /home/abraxas/rcpw"
+
+echo "#####################################################################"
+echo "                   SYSTEM UPDATE AND UPGRADE"
+echo "#####################################################################"
+echo; sleep 2
+echo; echo "sudo apt-get update && sudo apt-get upgrade -y"; 
+countdown 3 
+[[ $MY_PUEUE_INST -eq 1 ]] && /home/linuxbrew/.linuxbrew/bin/pueue parallel 1 -g system-setup
+[[ $MY_PUEUE_INST -eq 1 ]] && /home/linuxbrew/.linuxbrew/bin/pueue start -g system-setup
+[[ $MY_PUEUE_INST -eq 1 ]] && /home/linuxbrew/.linuxbrew/bin/pueue add -g system-setup -- sudo apt-get update && sudo apt-get upgrade -y ||  sudo apt-get update && sudo apt-get upgrade -y
+echo; countdown 2
+[[ $MY_PUEUE_INST -eq 1 ]] && /home/linuxbrew/.linuxbrew/bin/pueue add -g system-setup -- sudo apt-get install python3-pip firefox-esr -y || sudo apt-get install python3-pip firefox-esr -y
+echo; countdown 2
 
