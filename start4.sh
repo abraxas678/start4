@@ -29,3 +29,4 @@ git clone https://github.com/leahneukirchen/nq
 cp ./nq/nq /usr/bin && cp ./nq/fq /usr/bin && cp ./nq/tq /usr/bin
 sudo apt-get install python3-pip nano -y
 python -m pip install rich-cli
+
