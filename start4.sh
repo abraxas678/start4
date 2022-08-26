@@ -5,11 +5,9 @@ export PATH=$PATH:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/u
 ts=$(date +"%s")
 MY_FLOW_ID=$ts
 
-
 [[ ! -d  $HOME/tmp ]] && mkdir $HOME/tmp
 [[ ! -d  $HOME/github ]] && mkdir $HOME/github
 mkdir $HOME/tmp/$ts
-
 
 ##########################################################################################    USER SETUP/
 echo "CURRENT USER: $USER"; read -t 1 me
@@ -25,6 +23,26 @@ curl -fsSL https://tailscale.com/install.sh | sh | tail -f -n5
 sudo tailscale up --ssh
 sudo systemctl enable tailscaled
 sudo systemctl start tailscaled
+MY_TAILSCALE_IP=$(tailscale ip | head -n 1)
+echo "#!/bin/bash" >$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.config/rclone/rclone.conf $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.ssh/age-keys.txt $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.ssh/MPW.age  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+
+echo "sudo tailscale file cp $HOME/.ssh/id_ed25519  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.ssh/id_ed25519.pub  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.ssh/MPW.age  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+
+
+echo "sudo tailscale file cp $HOME/.config/rc.age  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.config/res.age   $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.config/syn_pw.age   $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.config/res_pw.sh    $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+
+echo "sudo tailscale file cp $HOME/.zshrc $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/.zsh.env $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/excludes.dat  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
+echo "sudo tailscale file cp $HOME/myfilter.txt  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
 
 ##########################################################################################    /TAILSCALE
 
