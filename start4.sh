@@ -13,9 +13,8 @@ cd $HOME/tmp/$ts
 
 ##########################################################################################    USER SETUP/
 echo "CURRENT USER: $USER"; read -t 1 me
-[[ $USER != "abraxas" ]] && [[ ! $(id -u abraxas) ]] && sudo adduser abraxas && sudo passwd abraxas && sudo usermod -aG sudo abraxas && su abraxas
+[[ $USER != "abraxas" ]] && [[ ! $(id -u abraxas) ]] && sudo adduser abraxas && sudo usermod -aG sudo abraxas && su abraxas
 [[ $USER != "abraxas" ]] && su abraxas
-echo "CURRENT USER: $USER"
 [[ $USER != "abraxas" ]]  && read -p BUTTON me || read -t 2 me
 ##########################################################################################    /USER SETUP
 
@@ -29,6 +28,10 @@ mv $HOME/tmp/$ts/nq/* $HOME/github/nq/
 cp ./github/nq /usr/bin && cp ./github/fq /usr/bin && cp ./github/tq /usr/bin
 chmod +x /usr/bin/*
 ##########################################################################################    /NQ
+
+$NQDIR="$HOME/tmp/$ts/python"
+[[ $(which "python3") = *"not found"* ]] && nq sudo apt-get install python3-pip -y
+[[ $(which "rich") = *"not found"* ]] && nq python -m pip install rich-cli
 
 ##########################################################################################    TAILSCALE/
 $APP_INSTALL="lsof"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
@@ -59,16 +62,21 @@ echo "sudo tailscale file cp $HOME/myfilter.txt  $MY_TAILSCALE_IP:" >>$HOME/tmp/
 echo "sudo tailscale file cp $HOME/.bashrc $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
 ##########################################################################################    /TAILSCALE
 
-[[ $(which "python3") = *"not found"* ]] && sudo apt-get install python3-pip -y
-[[ $(which "rich") = *"not found"* ]] && python -m pip install rich-cli
+nq -w
+frage
 
-$APP_INSTALL="nano"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
-$APP_INSTALL="git"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y && git config --global user.name abraxas678 && git config --global user.email abraxas678@gmail.com
+$APP_INSTALL="nano"; [[ $(which $APP_INSTALL) = *"not found"* ]] && nq sudo apt-get install $APP_INSTALL -y
+$APP_INSTALL="git"; [[ $(which $APP_INSTALL) = *"not found"* ]] && nq sudo apt-get install $APP_INSTALL -y && git config --global user.name abraxas678 && git config --global user.email abraxas678@gmail.com
+ng -w
+
 [[ ! -d $HOME/start4-backup ]] && mkdir $HOME/start4-backup
 [[ -d $HOME/start4 ]] &&  mv  $HOME/start4 $HOME/start4-backup/start4-backup-$ts
 cd $HOME/tmp/$ts
 git clone https://raw.githubusercontent.com/abraxas678/start4/main/start4.sh $HOME/tmp/$ts/start4
 mv $HOME/tmp/$ts/start4 $HOME/start4; source $HOME/start4/path.dat
+
+
+if [[ 1 -eq 0 ]]; then
 
 echo "#####################################################################"
 echo "                      CHECKING HARDWARE"
@@ -121,3 +129,4 @@ echo; countdown 2
 [[ $MY_PUEUE_INST -eq 1 ]] && /home/linuxbrew/.linuxbrew/bin/pueue add -g system-setup -- sudo apt-get install python3-pip firefox-esr -y || sudo apt-get install python3-pip firefox-esr -y
 echo; countdown 2
 
+fi
