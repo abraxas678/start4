@@ -1,13 +1,15 @@
+clear
 #######################################################
 echo "version 4.00"
 #######################################################
 export PATH=$PATH:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin:/usr/local/sbin:/usr/local/bin:/usr/path:/volume2/docker/utils/path:$HOME/.local/bin:$HOME/bin:/home/markus/.cargo/bin:/home/abraxas/.cargo/bin:/home/abraxas/.local/bin/:/home/abraxas/.cargo/bin:/home/linuxbrew/.linuxbrew/bin:/volume1/homes/abraxas678/bin:/usr/local/bin:$PATH
 ts=$(date +"%s")
 MY_FLOW_ID=$ts
+mkdir $HOME/tmp/$ts
+cd $HOME/tmp/$ts
 
 [[ ! -d  $HOME/tmp ]] && mkdir $HOME/tmp
 [[ ! -d  $HOME/github ]] && mkdir $HOME/github
-mkdir $HOME/tmp/$ts
 
 ##########################################################################################    USER SETUP/
 echo "CURRENT USER: $USER"; read -t 1 me
@@ -16,6 +18,17 @@ echo "CURRENT USER: $USER"; read -t 1 me
 echo "CURRENT USER: $USER"
 [[ $USER != "abraxas" ]]  && read -p BUTTON me || read -t 2 me
 ##########################################################################################    /USER SETUP
+
+##########################################################################################    NQ/
+$APP_INSTALL="unzip"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+$APP_INSTALL="wget"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
+mkdir $HOME/tmp/$ts/nq; cd $HOME/tmp/$ts/nq; wget https://github.com/leahneukirchen/nq/archive/refs/heads/master.zip; unzip master.zip; rm -f master.zip
+[[ ! -d $HOME/github ]] && mkdir $HOME/github
+[[ ! -d $HOME/github/nq ]] && mkdir $HOME/github/nq
+mv $HOME/tmp/$ts/nq/* $HOME/github/nq/
+cp ./github/nq /usr/bin && cp ./github/fq /usr/bin && cp ./github/tq /usr/bin
+chmod +x /usr/bin/*
+##########################################################################################    /NQ
 
 ##########################################################################################    TAILSCALE/
 $APP_INSTALL="lsof"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
@@ -43,8 +56,12 @@ echo "sudo tailscale file cp $HOME/.zshrc $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_
 echo "sudo tailscale file cp $HOME/.zsh.env $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
 echo "sudo tailscale file cp $HOME/excludes.dat  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
 echo "sudo tailscale file cp $HOME/myfilter.txt  $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
-
+echo "sudo tailscale file cp $HOME/.bashrc $MY_TAILSCALE_IP:" >>$HOME/tmp/setup4_install_$ts.sh
 ##########################################################################################    /TAILSCALE
+
+
+sudo apt-get install python3-pip nano -y
+python -m pip install rich-cli
 
 cd $HOME
 $APP_INSTALL="wget"; [[ $(which $APP_INSTALL) = *"not found"* ]] && sudo apt-get install $APP_INSTALL -y
@@ -56,14 +73,10 @@ git clone https://raw.githubusercontent.com/abraxas678/start4/main/start4.sh $HO
 mv $HOME/tmp/$ts/start4 $HOME/start4
 source $HOME/start4/path.dat
 
-git clone https://github.com/leahneukirchen/nq $HOME/tmp/$ts/nq
-mv $HOME/tmp/$ts/nq $HOME/github/nq
-cp ./github/nq /usr/bin && cp ./github/fq /usr/bin && cp ./github/tq /usr/bin
-chmod + /usr/bin
 
 
-sudo apt-get install python3-pip nano -y
-python -m pip install rich-cli
+
+
 
 
 echo "#####################################################################"
